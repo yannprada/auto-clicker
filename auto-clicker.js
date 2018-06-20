@@ -40,7 +40,7 @@ class AutoClicker {
       for (let y = 0; y <= 6; y++) {
         if (this.garden.isTileUnlocked(x, y) && this.tileIsEmpty(x, y)) {
           this._(`Planting seed "Baker's Wheat" on tile [${x}, ${y}]`);
-          this.plant(seeds.bakerWheat, x, y);
+          this.plant(this.seeds.bakerWheat, x, y);
         }
       }
     }
