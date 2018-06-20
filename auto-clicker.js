@@ -1,55 +1,44 @@
 let _ = msg => console.log(msg);
 
+
 class AutoClicker {
-  constructor(interval=10, debug=false) {
+  constructor(options) {
+    this.interval = options.interval || 10;
+    this.debug = options.debug || false;
     this.grimoire = Game.Objects['Wizard tower'].minigame;
-    this.spellButton = document.querySelector('#grimoireSpell0');
-    this.interval = interval;
-    this.debug = debug;
+    this.spells = {
+      conjureBakedGoods: {
+        button: document.querySelector('#grimoireSpell0'),
+        cast() { this.button.click(); },
+      },
+    }
   }
 
   manaIsFull() {
     return this.grimoire.magic >= this.grimoire.magicM;
   }
 
-  hasClotDebuff() {
-    return Boolean(Game.hasBuff('Clot'));
-  }
-
-  conjureBakedGoods() {
-    this.spellButton.click();
-  }
-
   run() {
-    if (this.manaIsFull() && !this.hasClotDebuff()) {
-      if (this.debug) {
-        _('Casting spell "Conjure Baked Goods"');
-      }
-      this.conjureBakedGoods();
-    } else {
-      if (this.debug) {
-        _(`Conditions not met: {
-          manaIsFull: ${this.manaIsFull()}, 
-          hasClothDebuff: ${this.hasClotDebuff()}
-        }`);
-      }
+    if (this.manaIsFull() && !Game.hasBuff('Clot')) {
+      this._('Casting spell "Conjure Baked Goods"');
+      this.spells.conjureBakedGoods.cast();
     }
   }
 
   start() {
-    if (this.debug) {
-      _('Starting AutoClicker');
-    }
+    this._('Starting AutoClicker');
     this.timerId = setInterval(this.run.bind(this), this.interval * 1000);
   }
 
   stop() {
-    if (this.debug) {
-      _('Stopping AutoClicker');
-    }
+    this._('Stopping AutoClicker');
     clearInterval(this.timerId);
+  }
+
+  _(msg) {
+    if (this.debug) { console.log(msg); }
   }
 }
 
-let launcher = new AutoClicker();
+let launcher = new AutoClicker({debug: true});
 launcher.start();
