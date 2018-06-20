@@ -1,6 +1,3 @@
-let _ = msg => console.log(msg);
-
-
 class AutoClicker {
   constructor(options) {
     this.interval = options.interval || 10;
