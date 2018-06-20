@@ -32,7 +32,7 @@ class AutoClicker {
     // Spells
     if (this.manaIsFull() && !Game.hasBuff('Clot')) {
       this._('Casting spell "Conjure Baked Goods"');
-      this.cast(spells.conjureBakedGoods);
+      this.cast(this.spells.conjureBakedGoods);
     }
 
     // Garden
