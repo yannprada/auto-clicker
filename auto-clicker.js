@@ -1,5 +1,8 @@
 class AutoClicker {
   constructor(options) {
+    if (options === undefined) {
+      options = {};
+    }
     this.interval = options.interval || 10;
     this.debug = options.debug || false;
     this.grimoire = Game.Objects['Wizard tower'].minigame;
