@@ -18,6 +18,15 @@ class AutoClicker {
     this.seeds = {
       0: 'Baker\'s Wheat',
     }
+    document.getElementById('sectionLeft').insertAdjacentHTML('beforeend',
+`<div style="font-size: 1.5em; color: white; position: absolute; top: 75%; left: 1em;
+             z-index: 10;" id="auto-clicker-infos">
+  <strong>Conjure Baked Goods infos:</strong><br/>
+  gain: <span id="auto-clicker-CBG-gain"
+        title="Cookies gained when casting Conjure Baked Goods."></span><br/>
+  keep: <span id="auto-clicker-CBG-bank"
+        title="Keep this amount of cookies in bank to maximise CBG output."></span>
+</div>`);
   }
 
   manaIsFull() {
@@ -38,6 +47,10 @@ class AutoClicker {
     this.garden.useTool(seedId, x, y);
   }
 
+  beautifyAndUpdate(elementId, amount) {
+    document.getElementById(elementId).textContent = Beautify(amount);
+  }
+
   run() {
     // Spells
     if (this.manaIsFull() && !Game.hasBuff('Clot') && !Game.hasBuff('Magic inept')) {
@@ -55,6 +68,11 @@ class AutoClicker {
         }
       }
     }
+
+    // Infos
+    let amount = Math.min(Game.cookies * 0.15, Game.cookiesPs * 1800);
+    this.beautifyAndUpdate('auto-clicker-CBG-gain', amount);
+    this.beautifyAndUpdate('auto-clicker-CBG-bank', Game.cookiesPs * 12000);
   }
 
   start() {
@@ -72,5 +90,5 @@ class AutoClicker {
   }
 }
 
-let launcher = new AutoClicker({debug: true});
+let launcher = new AutoClicker();
 launcher.start();
