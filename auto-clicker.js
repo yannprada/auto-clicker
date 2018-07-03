@@ -61,7 +61,7 @@ class AutoClicker {
         this.cast(8);
       }
       if (Game.hasBuff('Magic adept')) {
-        this.Cast(0);
+        this.cast(0);
       }
     }
 
