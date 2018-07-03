@@ -56,10 +56,12 @@ class AutoClicker {
 
   run() {
     // Spells
-    if (this.manaIsFull() && !Game.hasBuff('Clot') && !Game.hasBuff('Magic inept')) {
-      this.cast(8);
+    if (!Game.hasBuff('Clot') && !Game.hasBuff('Magic inept')) {
+      if (this.manaIsFull()) {
+        this.cast(8);
+      }
       if (Game.hasBuff('Magic adept')) {
-        this.cast(0);
+        this.Cast(0);
       }
     }
 
