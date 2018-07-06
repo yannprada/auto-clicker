@@ -3,7 +3,7 @@ class AutoClicker {
     if (options === undefined) {
       options = {};
     }
-    this.interval = options.interval || 10;
+    this.interval = options.interval || 1;
     this.debug = options.debug || false;
     this.grimoire = Game.Objects['Wizard tower'].minigame;
     this.spells = {
@@ -22,12 +22,20 @@ class AutoClicker {
       0: 'Baker\'s Wheat',
     }
     document.getElementById('sectionLeft').insertAdjacentHTML('beforeend',
-`<div style="font-size: 1.5em; color: white; position: absolute; top: 75%; left: 1em;
-             z-index: 10;" id="auto-clicker-infos">
+`<div id="auto-clicker-infos"
+    style="font-size: 1.5em; color: white; position: absolute;
+           top: 75%; left: 1em; z-index: 10;">
   <strong>Conjure Baked Goods infos:</strong><br/>
-  gain: <span id="auto-clicker-CBG-gain"
-        title="Cookies gained when casting Conjure Baked Goods."></span><br/>
-  keep: <span id="auto-clicker-CBG-bank"
+  current gain:
+  <span id="auto-clicker-CBG-gain"
+        title="Cookies gained when casting Conjure Baked Goods."></span>
+  <br/>
+  maximum gain:
+  <span id="auto-clicker-CBG-max-gain"
+        title="Maximum gain when casting Conjure Baked Goods (see below)"></span>
+  <br/>
+  keep in bank:
+  <span id="auto-clicker-CBG-bank"
         title="Keep this amount of cookies in bank to maximise CBG output."></span>
 </div>`);
   }
@@ -75,8 +83,10 @@ class AutoClicker {
     }
 
     // Infos
-    let amount = Math.min(Game.cookies * 0.15, Game.cookiesPs * 1800);
-    this.beautifyAndUpdate('auto-clicker-CBG-gain', amount);
+    const maxGain = Game.cookiesPs * 1800;
+    const gain = Math.min(Game.cookies * 0.15, maxGain);
+    this.beautifyAndUpdate('auto-clicker-CBG-gain', gain);
+    this.beautifyAndUpdate('auto-clicker-CBG-max-gain', maxGain);
     this.beautifyAndUpdate('auto-clicker-CBG-bank', Game.cookiesPs * 12000);
   }
 
