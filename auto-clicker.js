@@ -23,20 +23,21 @@ class AutoClicker {
     }
     document.getElementById('sectionLeft').insertAdjacentHTML('beforeend',
 `<div id="auto-clicker-infos"
-    style="font-size: 1.5em; color: white; position: absolute;
-           top: 75%; left: 1em; z-index: 10;">
-  <strong>Conjure Baked Goods infos:</strong><br/>
-  current gain:
-  <span id="auto-clicker-CBG-gain"
-        title="Cookies gained when casting Conjure Baked Goods."></span>
-  <br/>
-  maximum gain:
-  <span id="auto-clicker-CBG-max-gain"
-        title="Maximum gain when casting Conjure Baked Goods (see below)"></span>
-  <br/>
-  keep in bank:
-  <span id="auto-clicker-CBG-bank"
-        title="Keep this amount of cookies in bank to maximise CBG output."></span>
+    style="font-size: 1.5em; color: white; text-align: right; z-index: 10;
+           position: absolute; bottom: 5em; right: 1em; width: 100%;">
+  <p style="font-weight: bold;">Conjure Baked Goods infos</p>
+  <p title="Cookies gained when casting Conjure Baked Goods.">
+    current gain:
+    <span id="auto-clicker-CBG-gain"></span>
+  </p>
+  <p title="Maximum gain when casting Conjure Baked Goods (see below)">
+    maximum gain:
+    <span id="auto-clicker-CBG-max-gain"></span>
+  </p>
+  <p title="Keep this amount of cookies in bank to maximise CBG output.">
+    keep in bank:
+    <span id="auto-clicker-CBG-bank"></span>
+  </p>
 </div>`);
   }
 
