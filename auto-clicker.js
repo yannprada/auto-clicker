@@ -82,10 +82,10 @@ class AutoClicker {
       }
     }
 
-    // shimmers (golden cookies, reindeers, ...)
+    // golden cookies & reindeers
     Game.shimmers.forEach((shimmer) => {
-      if (shimmer.type == 'reindeer') {
-        shimmer.pop();
+      if (['golden', 'reindeer'].includes(shimmer.type) && shimmer.wrath == 0) {
+        setTimeout(shimmer.pop, 1000);
       }
     });
 
