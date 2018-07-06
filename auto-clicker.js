@@ -64,7 +64,7 @@ class AutoClicker {
   }
 
   run() {
-    // Spells
+    // Spells TODO: check spell cost before casting
     if (!Game.hasBuff('Clot') && !Game.hasBuff('Magic inept')) {
       if (this.manaIsFull()) {
         this.cast(8);
@@ -85,12 +85,12 @@ class AutoClicker {
 
     // golden cookies & reindeers
     Game.shimmers.forEach((shimmer) => {
-      if (['golden', 'reindeer'].includes(shimmer.type) && shimmer.wrath == 0) {
-        setTimeout(shimmer.pop, 1000);
+      if (['golden', 'reindeer'].includes(shimmer.type) && !shimmer.wrath) {
+        setTimeout(() => shimmer.pop(), 100);
       }
     });
 
-    // Infos
+    // Infos TODO: add colors (green good, red bad, maybe ?)
     const maxGain = Game.cookiesPs * 1800;
     const gain = Math.min(Game.cookies * 0.15, maxGain);
     this.beautifyAndUpdate('auto-clicker-CBG-gain', gain);
