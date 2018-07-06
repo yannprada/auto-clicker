@@ -82,6 +82,13 @@ class AutoClicker {
       }
     }
 
+    // shimmers (golden cookies, reindeers, ...)
+    Game.shimmers.forEach((shimmer) => {
+      if (shimmer.type == 'reindeer') {
+        shimmer.pop();
+      }
+    });
+
     // Infos
     const maxGain = Game.cookiesPs * 1800;
     const gain = Math.min(Game.cookies * 0.15, maxGain);
