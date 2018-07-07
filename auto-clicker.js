@@ -1,26 +1,141 @@
-class AutoClicker {
-  constructor(options) {
-    if (options === undefined) {
-      options = {};
-    }
-    this.interval = options.interval || 1;
-    this.debug = options.debug || false;
+
+class AutoClickerModule {
+  constructor(autoClicker) {
+    this.activated = true;
+    this.autoClicker = autoClicker;
+    this._ = autoClicker._;
+  }
+
+  activate() { this.activated = true }
+  deactivate() { this.activated = false }
+
+  gameHasBoost() {
+    return (
+      Game.hasBuff('Frenzy') || Game.hasBuff('Dragon Harvest') ||
+      Game.hasBuff('Dragonflight') || Game.hasBuff('Building special')
+    );
+  }
+}
+
+class SpellCaster extends AutoClickerModule {
+  constructor(autoClicker,
+              options = {waitForBoost: true, avoidClot: true}) {
+    super(autoClicker);
+    this.waitForBoost = options.waitForBoost;
+    this.avoidClot = options.avoidClot;
     this.grimoire = Game.Objects['Wizard tower'].minigame;
-    this.spells = {
-      0: 'Conjure Baked Goods',
-      1: 'Force the Hand of Fate',
-      2: 'Stretch Time',
-      3: 'Spontaneous Edifice',
-      4: 'Haggler\'s Charm',
-      5: 'Summon Crafting Pixies',
-      6: 'Ganbler\'s Fever Dream',
-      7: 'Resurrect Abomination',
-      8: 'Diminish Ineptitude',
+  }
+
+  manaIsFull() {
+    return this.grimoire.magic >= this.grimoire.magicM;
+  }
+
+  hasEnoughMagic(spell) {
+    return this.grimoire.getSpellCost(spell) <= this.grimoire.magic;
+  }
+
+  getSpellButton(spell) {
+    return document.querySelector(`#grimoireSpell${spell.id}`);
+  }
+
+  cast(spell) {
+    if (this.hasEnoughMagic(spell)) {
+      this._(`Casting spell "${spell.name}"`);
+      this.getSpellButton(spell).click();
     }
+  }
+
+  run() {
+    if (
+        !this.activated ||
+        (this.waitForBoost && !this.gameHasBoost()) ||
+        (this.avoidClot && Game.hasBuff('Clot')) ||
+        Game.hasBuff('Magic inept')) {
+      return;
+    }
+    if (this.manaIsFull()) {
+      this.cast(this.grimoire.spells['diminish ineptitude']);
+    }
+    if (Game.hasBuff('Magic adept')) {
+      this.cast(this.grimoire.spells['conjure baked goods']);
+    }
+  }
+}
+
+class SeedPlanter extends AutoClickerModule {
+  constructor(autoClicker,
+              options = {avoidBoosts: true, waitForClot: false}) {
+    super(autoClicker);
+    this.avoidBoosts = options.avoidBoosts;
+    this.waitForClot = options.waitForClot;
     this.garden = Game.Objects['Farm'].minigame;
     this.seeds = {
       0: 'Baker\'s Wheat',
+    };
+  }
+
+  tileIsEmpty(x, y) {
+    return this.garden.getTile(x, y)[0] == 0;
+  }
+
+  plant(seedId, x, y) {
+    this._(`Planting seed "${this.seeds[seedId]}" on tile [${x}, ${y}]`);
+    this.garden.useTool(seedId, x, y);
+  }
+
+  run() {
+    if (!this.activated) {
+      return;
     }
+    if (this.avoidBoosts && this.gameHasBoost()) {
+      return;
+    }
+    if (this.waitForClot && !Game.hasBuff('Clot')) {
+      return;
+    }
+    for (let x = 0; x <= 6; x++) {
+      for (let y = 0; y <= 6; y++) {
+        if (this.garden.isTileUnlocked(x, y) && this.tileIsEmpty(x, y)) {
+          setTimeout(() => this.plant(0, x, y), 10);
+        }
+      }
+    }
+  }
+}
+
+class ShimmerClicker extends AutoClickerModule {
+  constructor(autoClicker,
+              allow = {golden: true, wrath: false, reindeer: true}) {
+    super(autoClicker);
+    this.allow = allow;
+  }
+
+  click(shimmer, name) {
+    this._(`Clicking a ${name}`);
+    setTimeout(() => shimmer.pop(), 10);
+  }
+
+  run() {
+    if (!this.activated) {
+      return;
+    }
+    Game.shimmers.forEach((shimmer) => {
+      if (shimmer.type == 'golden') {
+        if (this.allow.golden && !shimmer.wrath) {
+          this.click(shimmer, 'golden cookie');
+        } else if (this.allow.wrath && shimmer.wrath) {
+          this.click(shimmer, 'wrath cookie');
+        }
+      } else if (this.allow.reindeer && shimmer.type == 'reindeer') {
+        this.click(shimmer, 'reindeer');
+      }
+    });
+  }
+}
+
+class BetterUI extends AutoClickerModule {
+  constructor(autoClicker) {
+    super(autoClicker);
     document.getElementById('sectionLeft').insertAdjacentHTML('beforeend',
 `<div id="auto-clicker-infos"
     style="font-size: 1.5em; color: white; text-align: right; z-index: 10;
@@ -41,61 +156,41 @@ class AutoClicker {
 </div>`);
   }
 
-  manaIsFull() {
-    return this.grimoire.magic >= this.grimoire.magicM;
-  }
-
-  cast(spellId) {
-    this._(`Casting spell "${this.spells[spellId]}"`);
-    document.querySelector(`#grimoireSpell${spellId}`).click();
-  }
-
-  tileIsEmpty(x, y) {
-    return this.garden.getTile(x, y)[0] == 0;
-  }
-
-  plant(seedId, x, y) {
-    this._(`Planting seed "${this.seeds[seedId]}" on tile [${x}, ${y}]`);
-    this.garden.useTool(seedId, x, y);
-  }
-
   beautifyAndUpdate(elementId, amount) {
     document.getElementById(elementId).textContent = Beautify(amount);
   }
 
   run() {
-    // Spells TODO: check spell cost before casting
-    if (!Game.hasBuff('Clot') && !Game.hasBuff('Magic inept')) {
-      if (this.manaIsFull()) {
-        this.cast(8);
-      }
-      if (Game.hasBuff('Magic adept')) {
-        this.cast(0);
-      }
-    }
-
-    // Garden
-    for (let x = 0; x <= 6; x++) {
-      for (let y = 0; y <= 6; y++) {
-        if (this.garden.isTileUnlocked(x, y) && this.tileIsEmpty(x, y)) {
-          this.plant(0, x, y);
-        }
-      }
-    }
-
-    // golden cookies & reindeers
-    Game.shimmers.forEach((shimmer) => {
-      if (['golden', 'reindeer'].includes(shimmer.type) && !shimmer.wrath) {
-        setTimeout(() => shimmer.pop(), 100);
-      }
-    });
-
-    // Infos TODO: add colors (green good, red bad, maybe ?)
+    // TODO: add colors (green good, red bad, maybe ?)
     const maxGain = Game.cookiesPs * 1800;
     const gain = Math.min(Game.cookies * 0.15, maxGain);
     this.beautifyAndUpdate('auto-clicker-CBG-gain', gain);
     this.beautifyAndUpdate('auto-clicker-CBG-max-gain', maxGain);
     this.beautifyAndUpdate('auto-clicker-CBG-bank', Game.cookiesPs * 12000);
+  }
+}
+
+class AutoClicker {
+  constructor(options = {interval: 1, debug: false}) {
+    this.interval = options.interval;
+    this.debug = options.debug;
+
+    this.modules = [
+      new SpellCaster(this, {waitForBoost: true, avoidClot: true}),
+      new SeedPlanter(this, {avoidBoosts: true, waitForClot: false}),
+      new ShimmerClicker(this, {golden: true, wrath: true, reindeer: true}),
+      new BetterUI(this),
+    ];
+  }
+
+  getModule(name) {
+    return this.modules.find((module) => module.constructor.name == name);
+  }
+
+  run() {
+    this.modules.forEach((module) => {
+      module.run();
+    });
   }
 
   start() {
@@ -113,5 +208,5 @@ class AutoClicker {
   }
 }
 
-let launcher = new AutoClicker();
-launcher.start();
+let autoClicker = new AutoClicker();
+autoClicker.start();
