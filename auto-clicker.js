@@ -1,4 +1,9 @@
 
+let buildingBuffs = Object.values(Game.goldenCookieBuildingBuffs).reduce(
+  (acc, next) => acc.concat(next), []);
+const CPSBOOSTS = ['Frenzy', 'Dragon Harvest'].concat(...buildingBuffs);
+
+
 class AutoClickerModule {
   constructor(autoClicker) {
     this.activated = true;
@@ -10,10 +15,12 @@ class AutoClickerModule {
   deactivate() { this.activated = false }
 
   gameHasBoost() {
-    return (
-      Game.hasBuff('Frenzy') || Game.hasBuff('Dragon Harvest') ||
-      Game.hasBuff('Dragonflight') || Game.hasBuff('Building special')
-    );
+    for (let buff of Game.buffs) {
+      if (CPSBOOSTS.includes(buff.name)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
