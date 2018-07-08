@@ -184,7 +184,7 @@ class AutoClicker {
 
     this.modules = [
       new SpellCaster(this, {waitForBoost: true, avoidClot: true}),
-      new SeedPlanter(this, {avoidBoosts: true, waitForClot: false}),
+      new SeedPlanter(this, {avoidBoosts: true, waitForClot: true}),
       new ShimmerClicker(this, {golden: true, wrath: true, reindeer: true}),
       new BetterUI(this),
     ];
