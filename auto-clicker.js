@@ -146,7 +146,7 @@ class BetterUI extends AutoClickerModule {
     document.getElementById('sectionLeft').insertAdjacentHTML('beforeend',
 `<div id="auto-clicker-infos"
     style="font-size: 1.5em; text-align: right; z-index: 10;
-           position: absolute; bottom: 5em; right: 0; width: 100%;
+           position: absolute; bottom: 5em; right: 0;
            color: white; background-color: rgba(0, 0, 0, 0.5)">
   <div style="margin: 0.5em;">
     <p style="font-weight: bold;">Conjure Baked Goods infos</p>
