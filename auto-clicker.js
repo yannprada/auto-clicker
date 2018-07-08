@@ -14,9 +14,10 @@ class AutoClickerModule {
   activate() { this.activated = true }
   deactivate() { this.activated = false }
 
-  gameHasBoost() {
-    for (let buff of Game.buffs) {
-      if (CPSBOOSTS.includes(buff.name)) {
+  aBoostIsActive() {
+    const buffs = Game.buffs;
+    for (let buff in buffs) {
+      if (CPSBOOSTS.includes(buff)) {
         return true;
       }
     }
@@ -55,9 +56,10 @@ class SpellCaster extends AutoClickerModule {
   run() {
     if (
         !this.activated ||
-        (this.waitForBoost && !this.gameHasBoost()) ||
-        (this.avoidClot && Game.hasBuff('Clot')) ||
-        Game.hasBuff('Magic inept')) {
+        Game.hasBuff('Magic inept') ||
+        (this.waitForBoost && !this.aBoostIsActive()) ||
+        (this.avoidClot && Game.hasBuff('Clot'))
+      ) {
       return;
     }
     if (this.manaIsFull()) {
@@ -91,13 +93,11 @@ class SeedPlanter extends AutoClickerModule {
   }
 
   run() {
-    if (!this.activated) {
-      return;
-    }
-    if (this.avoidBoosts && this.gameHasBoost()) {
-      return;
-    }
-    if (this.waitForClot && !Game.hasBuff('Clot')) {
+    if (
+        !this.activated ||
+        (this.avoidBoosts && this.aBoostIsActive()) ||
+        (this.waitForClot && !Game.hasBuff('Clot'))
+      ) {
       return;
     }
     for (let x = 0; x <= 6; x++) {
