@@ -145,33 +145,40 @@ class BetterUI extends AutoClickerModule {
     super(autoClicker);
     document.getElementById('sectionLeft').insertAdjacentHTML('beforeend',
 `<div id="auto-clicker-infos"
-    style="font-size: 1.5em; color: white; text-align: right; z-index: 10;
-           position: absolute; bottom: 5em; right: 1em; width: 100%;">
-  <p style="font-weight: bold;">Conjure Baked Goods infos</p>
-  <p title="Cookies gained when casting Conjure Baked Goods.">
-    current gain:
-    <span id="auto-clicker-CBG-gain"></span>
-  </p>
-  <p title="Maximum gain when casting Conjure Baked Goods (see below)">
-    maximum gain:
-    <span id="auto-clicker-CBG-max-gain"></span>
-  </p>
-  <p title="Keep this amount of cookies in bank to maximise CBG output.">
-    keep in bank:
-    <span id="auto-clicker-CBG-bank"></span>
-  </p>
+    style="font-size: 1.5em; text-align: right; z-index: 10;
+           position: absolute; bottom: 5em; right: 0; width: 100%;
+           color: white; background-color: rgba(0, 0, 0, 0.5)">
+  <div style="margin: 0.5em;">
+    <p style="font-weight: bold;">Conjure Baked Goods infos</p>
+    <p title="Cookies gained when casting Conjure Baked Goods.">
+      current gain:
+      <span id="auto-clicker-CBG-gain"></span>
+    </p>
+    <p title="Maximum gain when casting Conjure Baked Goods (see below)">
+      maximum gain:
+      <span id="auto-clicker-CBG-max-gain"></span>
+    </p>
+    <p title="Keep this amount of cookies in bank to maximise CBG output.">
+      keep in bank:
+      <span id="auto-clicker-CBG-bank"></span>
+    </p>
+  </div>
 </div>`);
   }
 
-  beautifyAndUpdate(elementId, amount) {
-    document.getElementById(elementId).textContent = Beautify(amount);
+  beautifyAndUpdate(elementId, amount, color = false) {
+    const element = document.getElementById(elementId);
+    element.textContent = Beautify(amount);
+    if (color) {
+      element.style.color = color;
+    }
   }
 
   run() {
-    // TODO: add colors (green good, red bad, maybe ?)
     const maxGain = Game.cookiesPs * 1800;
     const gain = Math.min(Game.cookies * 0.15, maxGain);
-    this.beautifyAndUpdate('auto-clicker-CBG-gain', gain);
+    this.beautifyAndUpdate('auto-clicker-CBG-gain', gain,
+      (gain >= maxGain) ? 'green' : 'red');
     this.beautifyAndUpdate('auto-clicker-CBG-max-gain', maxGain);
     this.beautifyAndUpdate('auto-clicker-CBG-bank', Game.cookiesPs * 12000);
   }
