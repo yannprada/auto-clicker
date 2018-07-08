@@ -73,7 +73,7 @@ class SpellCaster extends AutoClickerModule {
 
 class SeedPlanter extends AutoClickerModule {
   constructor(autoClicker,
-              options = {avoidBoosts: true, waitForClot: false}) {
+              options = {avoidBoosts: true, waitForClot: true}) {
     super(autoClicker);
     this.avoidBoosts = options.avoidBoosts;
     this.waitForClot = options.waitForClot;
@@ -184,7 +184,7 @@ class AutoClicker {
 
     this.modules = [
       new SpellCaster(this, {waitForBoost: true, avoidClot: true}),
-      new SeedPlanter(this, {avoidBoosts: true, waitForClot: false}),
+      new SeedPlanter(this, {avoidBoosts: true, waitForClot: true}),
       new ShimmerClicker(this, {golden: true, wrath: true, reindeer: true}),
       new BetterUI(this),
     ];
