@@ -1,8 +1,10 @@
 
-let buildingBuffs = Object.values(Game.goldenCookieBuildingBuffs).reduce(
-  (acc, next) => acc.concat(next), []);
-const CPSBOOSTS = ['Frenzy', 'Dragon Harvest'].concat(...buildingBuffs);
-
+const CPSBUFFS = ['Frenzy', 'Dragon Harvest'].concat(...buildingBuffs);
+const CPSDEBUFFS = ['Clot'];
+for (let [buff, debuff] of Object.values(Game.goldenCookieBuildingBuffs)) {
+  CPSBUFFS.push(buff);
+  CPSDEBUFFS.push(debuff);
+}
 
 class AutoClickerModule {
   constructor(autoClicker) {
@@ -14,23 +16,31 @@ class AutoClickerModule {
   activate() { this.activated = true }
   deactivate() { this.activated = false }
 
-  aBoostIsActive() {
+  _isOneOfTheseBuffsActive(BuffList) {
     const buffs = Game.buffs;
     for (let buff in buffs) {
-      if (CPSBOOSTS.includes(buff)) {
+      if (BuffList.includes(buff)) {
         return true;
       }
     }
     return false;
   }
+
+  aCpSBuffIsActive() {
+    return this._isOneOfTheseBuffsActive(CPSBUFFS);
+  }
+
+  aCpSDebuffIsActive() {
+    return this._isOneOfTheseBuffsActive(CPSDEBUFFS);
+  }
 }
 
 class SpellCaster extends AutoClickerModule {
   constructor(autoClicker,
-              options = {waitForBoost: true, avoidClot: true}) {
+              options = {waitForCpSBuff: true, avoidCpSDebuff: true}) {
     super(autoClicker);
-    this.waitForBoost = options.waitForBoost;
-    this.avoidClot = options.avoidClot;
+    this.waitForCpSBuff = options.waitForCpSBuff;
+    this.avoidCpSDebuff = options.avoidCpSDebuff;
     this.grimoire = Game.Objects['Wizard tower'].minigame;
   }
 
@@ -57,8 +67,8 @@ class SpellCaster extends AutoClickerModule {
     if (
         !this.activated ||
         Game.hasBuff('Magic inept') ||
-        (this.waitForBoost && !this.aBoostIsActive()) ||
-        (this.avoidClot && Game.hasBuff('Clot'))
+        (this.waitForCpSBuff && !this.aCpSBuffIsActive()) ||
+        (this.avoidCpSDebuff && this.aCpSDebuffIsActive())
       ) {
       return;
     }
@@ -73,10 +83,10 @@ class SpellCaster extends AutoClickerModule {
 
 class SeedPlanter extends AutoClickerModule {
   constructor(autoClicker,
-              options = {avoidBoosts: true, waitForClot: true}) {
+              options = {avoidCpSBuffs: true, waitForCpSDebuff: true}) {
     super(autoClicker);
-    this.avoidBoosts = options.avoidBoosts;
-    this.waitForClot = options.waitForClot;
+    this.avoidCpSBuffs = options.avoidCpSBuffs;
+    this.waitForCpSDebuff = options.waitForCpSDebuff;
     this.garden = Game.Objects['Farm'].minigame;
     this.seeds = {
       0: 'Baker\'s Wheat',
@@ -95,8 +105,8 @@ class SeedPlanter extends AutoClickerModule {
   run() {
     if (
         !this.activated ||
-        (this.avoidBoosts && this.aBoostIsActive()) ||
-        (this.waitForClot && !Game.hasBuff('Clot'))
+        (this.avoidCpSBuffs && this.aCpSBuffIsActive()) ||
+        (this.waitForCpSDebuff && !this.aCpSDebuffIsActive())
       ) {
       return;
     }
@@ -190,8 +200,8 @@ class AutoClicker {
     this.debug = options.debug;
 
     this.modules = [
-      new SpellCaster(this, {waitForBoost: true, avoidClot: true}),
-      new SeedPlanter(this, {avoidBoosts: true, waitForClot: true}),
+      new SpellCaster(this, {waitForCpSBuff: true, avoidCpSDebuff: true}),
+      new SeedPlanter(this, {avoidCpSBuffs: true, waitForCpSDebuff: true}),
       new ShimmerClicker(this, {golden: true, wrath: true, reindeer: true}),
       new BetterUI(this),
     ];
