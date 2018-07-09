@@ -1,5 +1,5 @@
 
-const CPSBUFFS = ['Frenzy', 'Dragon Harvest'].concat(...buildingBuffs);
+const CPSBUFFS = ['Frenzy', 'Dragon Harvest'];
 const CPSDEBUFFS = ['Clot'];
 for (let [buff, debuff] of Object.values(Game.goldenCookieBuildingBuffs)) {
   CPSBUFFS.push(buff);
